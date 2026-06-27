@@ -1,0 +1,83 @@
+[
+  {
+    "nama": "Akmal Rizky Pratama",
+    "email": "Akmal@student.ac.id",
+    "telepon": "081234567890",
+    "nim": "241011450433",
+    "jurusan": "Teknik Informatika",
+    "angkatan": 2025,
+    "ipk": 3.75
+  },
+  {
+    "nama": "Budi Santoso",
+    "email": "budi@student.ac.id",
+    "telepon": "081234567891",
+    "nim": "12345679",
+    "jurusan": "Sistem Informasi",
+    "angkatan": 2021,
+    "ipk": 3.45
+  },
+  {
+    "nama": "Citra Dewi",
+    "email": "citra@student.ac.id",
+    "telepon": "081234567892",
+    "nim": "12345680",
+    "jurusan": "Teknik Informatika",
+    "angkatan": 2022,
+    "ipk": 3.9
+  },
+  {
+    "nama": "Dian Kusuma",
+    "email": "dian@student.ac.id",
+    "telepon": "081234567893",
+    "nim": "12345681",
+    "jurusan": "Manajemen Informatika",
+    "angkatan": 2020,
+    "ipk": 3.2
+  },
+  {
+    "nama": "Eka Putri",
+    "email": "eka@student.ac.id",
+    "telepon": "081234567894",
+    "nim": "12345682",
+    "jurusan": "Teknik Komputer",
+    "angkatan": 2023,
+    "ipk": 3.6
+  },
+  {
+    "nama": "Fajar Nugroho",
+    "email": "fajar@student.ac.id",
+    "telepon": "081234567895",
+    "nim": "12345683",
+    "jurusan": "Sistem Informasi",
+    "angkatan": 2021,
+    "ipk": 3.1
+  },
+  {
+    "nama": "Gita Rahayu",
+    "email": "gita@student.ac.id",
+    "telepon": "081234567896",
+    "nim": "12345684",
+    "jurusan": "Teknik Informatika",
+    "angkatan": 2022,
+    "ipk": 3.85
+  },
+  {
+    "nama": "Hendra Wijaya",
+    "email": "hendra@student.ac.id",
+    "telepon": "081234567897",
+    "nim": "12345685",
+    "jurusan": "Teknik Komputer",
+    "angkatan": 2020,
+    "ipk": 2.95
+  },
+  {
+    "nama": "Fajar azizi",
+    "email": "azize@gmail.com",
+    "telepon": "08124123214",
+    "nim": "241002223",
+    "jurusan": "Teknik Informatika",
+    "angkatan": 2025,
+    "ipk": 3.9
+  }
+]

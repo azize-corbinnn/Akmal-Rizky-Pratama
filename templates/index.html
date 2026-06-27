@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manajemen Data Mahasiswa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* ── Reset & Variables ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #0a0e1a;
+      --bg2:       #0f1426;
+      --bg3:       #151c30;
+      --border:    rgba(255,255,255,.07);
+      --border2:   rgba(255,255,255,.12);
+      --accent:    #6366f1;
+      --accent2:   #818cf8;
+      --accent3:   #4f46e5;
+      --emerald:   #10b981;
+      --amber:     #f59e0b;
+      --rose:      #f43f5e;
+      --cyan:      #06b6d4;
+      --text:      #f1f5f9;
+      --text2:     #94a3b8;
+      --text3:     #64748b;
+      --radius:    12px;
+      --radius2:   18px;
+      --shadow:    0 4px 24px rgba(0,0,0,.4);
+      --shadow2:   0 8px 40px rgba(99,102,241,.15);
+      --sidebar-w: 260px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-thumb { background: var(--accent3); border-radius: 4px; }
+
+    /* ══════════════════════════════════════════
+       LOGIN PAGE
+    ══════════════════════════════════════════ */
+    #login-page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,.18) 0%, transparent 70%),
+        var(--bg);
+    }
+    .login-card {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius2);
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow2);
+      animation: fadeUp .5s ease;
+    }
+    .login-logo {
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 2rem;
+    }
+    .login-logo .logo-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      display: grid; place-items: center; font-size: 1.2rem;
+    }
+    .login-logo h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.3rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--text), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .login-logo p { font-size: .73rem; color: var(--text3); line-height: 1; }
+    .login-title { font-size: 1.5rem; font-weight: 700; margin-bottom: .4rem; }
+    .login-sub { color: var(--text2); font-size: .88rem; margin-bottom: 2rem; }
+    .input-group { margin-bottom: 1.1rem; }
+    .input-group label { display: block; font-size: .8rem; font-weight: 500; color: var(--text2); margin-bottom: .4rem; letter-spacing: .03em; }
+    .input-wrap { position: relative; }
+    .input-wrap i { position: absolute; left: .9rem; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: .85rem; }
+    .input-wrap input {
+      width: 100%; padding: .72rem .9rem .72rem 2.4rem;
+      background: var(--bg3); border: 1px solid var(--border2);
+      border-radius: var(--radius); color: var(--text); font-size: .9rem;
+      outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .input-wrap input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99,102,241,.15);
+    }
+    .toggle-pw {
+      position: absolute; right: .9rem; top: 50%; transform: translateY(-50%);
+      cursor: pointer; color: var(--text3); font-size: .85rem;
+      background: none; border: none; padding: 0;
+    }
+    .btn-login {
+      width: 100%; padding: .8rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
+      color: #fff; border: none; border-radius: var(--radius);
+      font-size: .95rem; font-weight: 600; cursor: pointer;
+      margin-top: .5rem; transition: opacity .2s, transform .1s;
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+    }
+    .btn-login:hover { opacity: .9; }
+    .btn-login:active { transform: scale(.98); }
+    .login-hint {
+      margin-top: 1.5rem; padding: 1rem;
+      background: rgba(99,102,241,.07); border: 1px solid rgba(99,102,241,.2);
+      border-radius: var(--radius); font-size: .8rem; color: var(--text2);
+    }
+    .login-hint strong { color: var(--accent2); }
+    .login-error {
+      background: rgba(244,63,94,.1); border: 1px solid rgba(244,63,94,.3);
+      border-radius: var(--radius); padding: .7rem 1rem;
+      color: #fca5a5; font-size: .83rem; margin-top: .8rem;
+      display: none;
+    }
+
+    /* ══════════════════════════════════════════
+       MAIN APP
+    ══════════════════════════════════════════ */
+    #app { display: none; }
+    #app.active { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w); min-height: 100vh;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; z-index: 100;
+      transition: transform .3s ease;
+    }
+    .sidebar-header {
+      padding: 1.4rem 1.2rem; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .sidebar-header .logo-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      display: grid; place-items: center; font-size: 1rem; flex-shrink: 0;
+    }
+    .sidebar-header .brand h2 {
+      font-family: 'Sora', sans-serif; font-size: 1rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--text), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .sidebar-header .brand p { font-size: .7rem; color: var(--text3); }
+    .sidebar-nav { flex: 1; padding: 1rem .75rem; overflow-y: auto; }
+    .nav-section { margin-bottom: 1.5rem; }
+    .nav-section-title {
+      font-size: .65rem; font-weight: 600; letter-spacing: .12em;
+      color: var(--text3); text-transform: uppercase;
+      padding: 0 .5rem; margin-bottom: .5rem;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .62rem .75rem; border-radius: var(--radius);
+      cursor: pointer; transition: background .15s, color .15s;
+      color: var(--text2); font-size: .87rem; font-weight: 500;
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .nav-item:hover { background: var(--bg3); color: var(--text); }
+    .nav-item.active {
+      background: rgba(99,102,241,.15);
+      color: var(--accent2); border: 1px solid rgba(99,102,241,.2);
+    }
+    .nav-item i { width: 18px; text-align: center; font-size: .9rem; }
+    .sidebar-footer {
+      padding: 1rem .75rem; border-top: 1px solid var(--border);
+    }
+    .user-card {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .7rem .75rem; border-radius: var(--radius);
+      background: var(--bg3);
+    }
+    .user-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--emerald));
+      display: grid; place-items: center; font-size: .85rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-info .uname { font-size: .85rem; font-weight: 600; truncate }
+    .user-info .urole { font-size: .7rem; color: var(--text3); }
+    .btn-logout {
+      background: none; border: none; color: var(--text3);
+      cursor: pointer; padding: .3rem; border-radius: 6px;
+      transition: color .15s, background .15s;
+    }
+    .btn-logout:hover { color: var(--rose); background: rgba(244,63,94,.1); }
+
+    /* ── Overlay (mobile) ── */
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.6); z-index: 99;
+    }
+    .sidebar-overlay.show { display: block; }
+
+    /* ── Main Content ── */
+    .main-content {
+      margin-left: var(--sidebar-w); flex: 1;
+      display: flex; flex-direction: column; min-height: 100vh;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(10,14,26,.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: .9rem 1.5rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .btn-hamburger {
+      display: none; background: none; border: 1px solid var(--border2);
+      border-radius: 8px; color: var(--text); cursor: pointer;
+      width: 36px; height: 36px; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0; transition: background .15s;
+    }
+    .btn-hamburger:hover { background: var(--bg3); }
+    .topbar-title { flex: 1; }
+    .topbar-title h2 { font-size: 1rem; font-weight: 600; }
+    .topbar-title p { font-size: .75rem; color: var(--text3); }
+    .topbar-actions { display: flex; gap: .5rem; }
+    .badge-total {
+      background: rgba(99,102,241,.15); border: 1px solid rgba(99,102,241,.25);
+      color: var(--accent2); border-radius: 20px; padding: .3rem .8rem;
+      font-size: .78rem; font-weight: 600;
+    }
+
+    /* ── Page Container ── */
+    .page { display: none; padding: 1.5rem; animation: fadeIn .3s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+
+    /* ── Stats Cards ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius2); padding: 1.2rem 1.4rem;
+      display: flex; align-items: center; gap: 1rem;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .stat-card:hover { border-color: var(--border2); box-shadow: var(--shadow); }
+    .stat-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: grid; place-items: center; font-size: 1.2rem; flex-shrink: 0;
+    }
+    .stat-icon.purple { background: rgba(99,102,241,.15); color: var(--accent2); }
+    .stat-icon.green  { background: rgba(16,185,129,.15); color: var(--emerald); }
+    .stat-icon.amber  { background: rgba(245,158,11,.15); color: var(--amber); }
+    .stat-icon.cyan   { background: rgba(6,182,212,.15);  color: var(--cyan); }
+    .stat-val { font-size: 1.6rem; font-weight: 700; line-height: 1; }
+    .stat-lbl { font-size: .78rem; color: var(--text3); margin-top: .25rem; }
+
+    /* ── Section Header ── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: .75rem; margin-bottom: 1.2rem;
+    }
+    .section-header h3 { font-size: 1rem; font-weight: 600; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .55rem 1rem; border-radius: var(--radius);
+      font-size: .83rem; font-weight: 500; cursor: pointer;
+      border: 1px solid transparent; transition: all .15s;
+    }
+    .btn-primary {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+    }
+    .btn-primary:hover { background: var(--accent3); }
+    .btn-secondary {
+      background: var(--bg3); color: var(--text2); border-color: var(--border2);
+    }
+    .btn-secondary:hover { background: var(--bg2); color: var(--text); }
+    .btn-danger { background: rgba(244,63,94,.1); color: #fca5a5; border-color: rgba(244,63,94,.25); }
+    .btn-danger:hover { background: rgba(244,63,94,.2); }
+    .btn-success { background: rgba(16,185,129,.1); color: #6ee7b7; border-color: rgba(16,185,129,.25); }
+    .btn-success:hover { background: rgba(16,185,129,.2); }
+    .btn-warning { background: rgba(245,158,11,.1); color: #fcd34d; border-color: rgba(245,158,11,.25); }
+    .btn-warning:hover { background: rgba(245,158,11,.2); }
+    .btn-sm { padding: .38rem .7rem; font-size: .78rem; }
+    .btn-icon { width: 32px; height: 32px; padding: 0; justify-content: center; }
+
+    /* ── Controls Bar ── */
+    .controls-bar {
+      display: flex; align-items: center; gap: .75rem;
+      flex-wrap: wrap; margin-bottom: 1rem;
+    }
+    .search-input-wrap { position: relative; flex: 1; min-width: 220px; }
+    .search-input-wrap i { position: absolute; left: .8rem; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: .85rem; }
+    .search-input-wrap input {
+      width: 100%; padding: .6rem .9rem .6rem 2.3rem;
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: var(--radius); color: var(--text); font-size: .85rem; outline: none;
+      transition: border-color .2s;
+    }
+    .search-input-wrap input:focus { border-color: var(--accent); }
+    select.ctrl-select {
+      padding: .6rem .9rem; background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: var(--radius); color: var(--text); font-size: .83rem; outline: none; cursor: pointer;
+    }
+    select.ctrl-select:focus { border-color: var(--accent); }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius2); overflow: hidden;
+    }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+    thead tr { background: var(--bg3); border-bottom: 1px solid var(--border); }
+    thead th {
+      padding: .85rem 1rem; text-align: left; font-weight: 600;
+      color: var(--text2); font-size: .78rem; letter-spacing: .04em; text-transform: uppercase;
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border); transition: background .12s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,.025); }
+    tbody td { padding: .85rem 1rem; vertical-align: middle; }
+    .nim-badge {
+      font-family: monospace; font-size: .78rem;
+      background: rgba(99,102,241,.1); color: var(--accent2);
+      border: 1px solid rgba(99,102,241,.2);
+      border-radius: 6px; padding: .2rem .5rem;
+    }
+    .ipk-badge {
+      font-size: .8rem; font-weight: 600; padding: .2rem .55rem; border-radius: 20px;
+    }
+    .ipk-high   { background: rgba(16,185,129,.1); color: #6ee7b7; }
+    .ipk-medium { background: rgba(245,158,11,.1); color: #fcd34d; }
+    .ipk-low    { background: rgba(244,63,94,.1);  color: #fca5a5; }
+    .action-btns { display: flex; gap: .4rem; }
+
+    /* ── Pagination ── */
+    .pagination {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .9rem 1rem; border-top: 1px solid var(--border);
+      flex-wrap: wrap; gap: .5rem;
+    }
+    .page-info { font-size: .8rem; color: var(--text3); }
+    .page-btns { display: flex; gap: .35rem; }
+    .page-btn {
+      padding: .35rem .65rem; border-radius: 7px; font-size: .8rem;
+      background: var(--bg3); border: 1px solid var(--border2); color: var(--text2);
+      cursor: pointer; transition: all .15s;
+    }
+    .page-btn:hover { background: var(--bg2); color: var(--text); }
+    .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .page-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── Empty State ── */
+    .empty-state {
+      text-align: center; padding: 3rem 1rem; color: var(--text3);
+    }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 1rem; color: var(--text3); }
+    .empty-state p { font-size: .9rem; }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.7); z-index: 200;
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: var(--radius2); width: 100%; max-width: 520px;
+      max-height: 90vh; overflow-y: auto; animation: fadeUp .25s ease;
+      box-shadow: var(--shadow2);
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.3rem 1.5rem; border-bottom: 1px solid var(--border);
+    }
+    .modal-header h3 { font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: .5rem; }
+    .btn-close {
+      background: none; border: none; color: var(--text3); cursor: pointer;
+      font-size: 1.1rem; padding: .25rem; border-radius: 6px;
+      transition: color .15s, background .15s;
+    }
+    .btn-close:hover { color: var(--rose); background: rgba(244,63,94,.1); }
+    .modal-body { padding: 1.5rem; }
+    .modal-footer {
+      padding: 1rem 1.5rem; border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: .5rem;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block; font-size: .78rem; font-weight: 500;
+      color: var(--text2); margin-bottom: .35rem; letter-spacing: .03em;
+    }
+    .form-group input, .form-group select {
+      width: 100%; padding: .65rem .85rem;
+      background: var(--bg3); border: 1px solid var(--border2);
+      border-radius: var(--radius); color: var(--text); font-size: .87rem; outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+    }
+    .form-group input.error { border-color: var(--rose); }
+    .form-help { font-size: .72rem; color: var(--text3); margin-top: .3rem; }
+    .form-help.error-msg { color: #fca5a5; }
+    .modal-error {
+      background: rgba(244,63,94,.08); border: 1px solid rgba(244,63,94,.25);
+      border-radius: var(--radius); padding: .75rem 1rem;
+      color: #fca5a5; font-size: .82rem; margin-bottom: 1rem; display: none;
+    }
+
+    /* ── Detail Modal ── */
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .detail-item label { display: block; font-size: .72rem; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: .3rem; }
+    .detail-item .detail-val { font-size: .92rem; font-weight: 500; }
+    .detail-separator { grid-column: 1 / -1; height: 1px; background: var(--border); }
+
+    /* ── Confirm Modal ── */
+    .confirm-icon { font-size: 2.5rem; text-align: center; margin-bottom: 1rem; }
+    .confirm-text { text-align: center; color: var(--text2); font-size: .9rem; }
+    .confirm-text strong { color: var(--text); }
+
+    /* ── Alert ── */
+    .alert-container { position: fixed; top: 1rem; right: 1rem; z-index: 999; display: flex; flex-direction: column; gap: .5rem; max-width: 360px; }
+    .alert {
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: var(--radius); padding: .8rem 1rem;
+      display: flex; align-items: flex-start; gap: .7rem;
+      box-shadow: var(--shadow); animation: slideIn .3s ease; font-size: .85rem;
+    }
+    @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:none; } }
+    .alert-success { border-left: 3px solid var(--emerald); }
+    .alert-error   { border-left: 3px solid var(--rose); }
+    .alert-info    { border-left: 3px solid var(--accent2); }
+    .alert i { margin-top: .1rem; }
+    .alert-success i { color: var(--emerald); }
+    .alert-error   i { color: var(--rose); }
+    .alert-info    i { color: var(--accent2); }
+    .alert-body { flex: 1; }
+    .alert-title { font-weight: 600; margin-bottom: .15rem; }
+    .alert-msg { color: var(--text2); font-size: .8rem; }
+
+    /* ── Sort/Search Page ── */
+    .algo-panel {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius2); padding: 1.3rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .algo-panel h4 { font-size: .9rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+    .algo-controls { display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-end; }
+    .algo-controls .form-group { margin-bottom: 0; min-width: 160px; }
+    .result-info {
+      display: flex; gap: 1.5rem; flex-wrap: wrap;
+      background: rgba(99,102,241,.07); border: 1px solid rgba(99,102,241,.15);
+      border-radius: var(--radius); padding: .75rem 1rem; margin-bottom: 1rem;
+      font-size: .8rem;
+    }
+    .result-info span { color: var(--text2); }
+    .result-info strong { color: var(--accent2); }
+    .complexity-table {
+      width: 100%; font-size: .82rem; border-collapse: collapse; margin-top: .5rem;
+    }
+    .complexity-table th, .complexity-table td { padding: .6rem .9rem; text-align: left; border-bottom: 1px solid var(--border); }
+    .complexity-table thead th { color: var(--text3); font-weight: 600; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; }
+    .complexity-table tbody tr:hover { background: rgba(255,255,255,.02); }
+    .tag-on   { background: rgba(16,185,129,.1); color: #6ee7b7; border-radius: 4px; padding: .15rem .45rem; font-size: .75rem; font-weight: 600; }
+    .tag-on2  { background: rgba(245,158,11,.1); color: #fcd34d; border-radius: 4px; padding: .15rem .45rem; font-size: .75rem; font-weight: 600; }
+    .tag-on3  { background: rgba(99,102,241,.12); color: var(--accent2); border-radius: 4px; padding: .15rem .45rem; font-size: .75rem; font-weight: 600; }
+
+    /* ── Loading Spinner ── */
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE — MOBILE
+    ══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      :root { --sidebar-w: 260px; }
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); box-shadow: var(--shadow2); }
+      .main-content { margin-left: 0; }
+      .btn-hamburger { display: flex; }
+      .form-row { grid-template-columns: 1fr; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .controls-bar { flex-direction: column; align-items: stretch; }
+      .search-input-wrap { min-width: unset; }
+      .algo-controls { flex-direction: column; }
+      .algo-controls .form-group { min-width: unset; width: 100%; }
+      .page { padding: 1rem; }
+      .topbar { padding: .75rem 1rem; }
+      .result-info { flex-direction: column; gap: .5rem; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .modal { max-width: 100%; margin: 0; border-radius: var(--radius); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ LOGIN PAGE ═══════════════════ -->
+<div id="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">🎓</div>
+      <div>
+        <h1>Sistem Informasi</h1>
+        <p>Sistem Manajemen Mahasiswa</p>
+      </div>
+    </div>
+    <h2 class="login-title">Selamat Datang</h2>
+    <p class="login-sub">Masuk untuk mengakses sistem manajemen data mahasiswa.</p>
+
+    <div class="input-group">
+      <label>Username</label>
+      <div class="input-wrap">
+        <i class="fas fa-user"></i>
+        <input type="text" id="login-username" placeholder="Masukkan username" autocomplete="username" />
+      </div>
+    </div>
+    <div class="input-group">
+      <label>Password</label>
+      <div class="input-wrap">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="login-password" placeholder="Masukkan password" autocomplete="current-password" />
+        <button class="toggle-pw" onclick="togglePw()" type="button"><i class="fas fa-eye" id="pw-eye"></i></button>
+      </div>
+    </div>
+
+    <div class="login-error" id="login-error"></div>
+
+    <button class="btn-login" id="btn-login" onclick="doLogin()">
+      <i class="fas fa-sign-in-alt"></i> Masuk
+    </button>
+
+    <div class="login-hint">
+      <strong>Demo Akun:</strong><br/>
+      username: <strong>admin</strong> &nbsp;|&nbsp; password: <strong>admin123</strong><br/>
+      username: <strong>Eka Sri Rahayu</strong> &nbsp;|&nbsp; password: <strong>test123</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MAIN APP ═══════════════════ -->
+<div id="app">
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">🎓</div>
+      <div class="brand">
+        <h2>Managemen Data Mahasiswa</h2>
+        <p>SiData — Academic</p>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Menu Utama</div>
+        <button class="nav-item active" onclick="showPage('dashboard')">
+          <i class="fas fa-chart-pie"></i> Dashboard
+        </button>
+        <button class="nav-item" onclick="showPage('data')">
+          <i class="fas fa-users"></i> Data Mahasiswa
+        </button>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Fitur</div>
+        <button class="nav-item" onclick="showPage('search')">
+          <i class="fas fa-search"></i> Pencarian
+        </button>
+        <button class="nav-item" onclick="showPage('sort')">
+          <i class="fas fa-sort-amount-down"></i> Pengurutan
+        </button>
+        <button class="nav-item" onclick="showPage('complexity')">
+          <i class="fas fa-clock"></i> Time Complexity
+        </button>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar" id="user-avatar-text">A</div>
+        <div class="user-info">
+          <div class="uname" id="sidebar-username">admin</div>
+          <div class="urole">Administrator</div>
+        </div>
+        <button class="btn-logout" onclick="doLogout()" title="Logout">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="btn-hamburger" id="hamburger-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="topbar-title">
+        <h2 id="page-title">Dashboard</h2>
+        <p id="page-subtitle">Ringkasan data mahasiswa</p>
+      </div>
+      <div class="topbar-actions">
+        <span class="badge-total" id="total-badge">0 Mahasiswa</span>
+      </div>
+    </header>
+
+    <!-- ─── DASHBOARD PAGE ─── -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+          <div><div class="stat-val" id="stat-total">0</div><div class="stat-lbl">Total Mahasiswa</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-star"></i></div>
+          <div><div class="stat-val" id="stat-avg-ipk">0.00</div><div class="stat-lbl">Rata-rata IPK</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber"><i class="fas fa-building-columns"></i></div>
+          <div><div class="stat-val" id="stat-jurusan">0</div><div class="stat-lbl">Jurusan Aktif</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon cyan"><i class="fas fa-database"></i></div>
+          <div><div class="stat-val">JSON</div><div class="stat-lbl">Format Penyimpanan</div></div>
+        </div>
+      </div>
+
+      <!-- Jurusan Distribution -->
+      <div class="section-header"><h3>📊 Distribusi Jurusan</h3></div>
+      <div class="table-wrap" style="margin-bottom:1.5rem;">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Jurusan</th><th>Jumlah Mahasiswa</th><th>Persentase</th></tr></thead>
+            <tbody id="jurusan-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent Data -->
+      <div class="section-header">
+        <h3>👤 Data Terbaru</h3>
+        <button class="btn btn-primary btn-sm" onclick="showPage('data')"><i class="fas fa-arrow-right"></i> Lihat Semua</button>
+      </div>
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>NIM</th><th>Nama</th><th>Jurusan</th><th>IPK</th></tr></thead>
+            <tbody id="recent-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── DATA MAHASISWA PAGE ─── -->
+    <div class="page" id="page-data">
+      <div class="controls-bar">
+        <div class="search-input-wrap">
+          <i class="fas fa-search"></i>
+          <input type="text" id="table-search" placeholder="Cari mahasiswa..." oninput="filterTable()" />
+        </div>
+        <select class="ctrl-select" id="filter-jurusan" onchange="filterTable()">
+          <option value="">Semua Jurusan</option>
+        </select>
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <i class="fas fa-plus"></i> Tambah
+        </button>
+      </div>
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>No</th><th>NIM</th><th>Nama</th><th>Jurusan</th>
+                <th>Angkatan</th><th>IPK</th><th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="main-table-body"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pagination">
+          <div class="page-info" id="page-info"></div>
+          <div class="page-btns" id="page-btns"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── PENCARIAN PAGE ─── -->
+    <div class="page" id="page-search">
+      <div class="algo-panel">
+        <h4><i class="fas fa-search"></i> Konfigurasi Pencarian</h4>
+        <div class="algo-controls">
+          <div class="form-group">
+            <label>Kata Kunci</label>
+            <input type="text" id="search-keyword" placeholder="Ketik pencarian..." class="form-group input" style="padding:.6rem .85rem;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:.87rem;outline:none;" />
+          </div>
+          <div class="form-group">
+            <label>Metode</label>
+            <select class="ctrl-select" id="search-method" style="width:100%;">
+              <option value="sequential">Sequential Search — O(n×f)</option>
+              <option value="linear">Linear Search — O(n)</option>
+              <option value="binary">Binary Search — O(log n)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Field (Linear/Binary)</label>
+            <select class="ctrl-select" id="search-field" style="width:100%;">
+              <option value="nama">Nama</option>
+              <option value="nim">NIM</option>
+              <option value="jurusan">Jurusan</option>
+              <option value="email">Email</option>
+            </select>
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-end;">
+            <button class="btn btn-primary" onclick="doSearch()" style="width:100%;">
+              <i class="fas fa-search"></i> Cari
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="result-info" id="search-result-info" style="display:none;"></div>
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>NIM</th><th>Nama</th><th>Jurusan</th><th>Angkatan</th><th>IPK</th><th>Aksi</th></tr></thead>
+            <tbody id="search-table-body">
+              <tr><td colspan="6"><div class="empty-state"><i class="fas fa-search"></i><p>Masukkan kata kunci dan tekan Cari</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── PENGURUTAN PAGE ─── -->
+    <div class="page" id="page-sort">
+      <div class="algo-panel">
+        <h4><i class="fas fa-sort-amount-down"></i> Konfigurasi Pengurutan</h4>
+        <div class="algo-controls">
+          <div class="form-group">
+            <label>Algoritma</label>
+            <select class="ctrl-select" id="sort-method" style="width:100%;">
+              <option value="merge">Merge Sort — O(n log n)</option>
+              <option value="bubble">Bubble Sort — O(n²)</option>
+              <option value="selection">Selection Sort — O(n²)</option>
+              <option value="insertion">Insertion Sort — O(n²)</option>
+              <option value="shell">Shell Sort — O(n log²n)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Urutkan Berdasarkan</label>
+            <select class="ctrl-select" id="sort-key" style="width:100%;">
+              <option value="nama">Nama</option>
+              <option value="nim">NIM</option>
+              <option value="ipk">IPK</option>
+              <option value="angkatan">Angkatan</option>
+              <option value="jurusan">Jurusan</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Urutan</label>
+            <select class="ctrl-select" id="sort-order" style="width:100%;">
+              <option value="asc">A → Z / Kecil → Besar</option>
+              <option value="desc">Z → A / Besar → Kecil</option>
+            </select>
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-end;">
+            <button class="btn btn-primary" onclick="doSort()" style="width:100%;">
+              <i class="fas fa-sort"></i> Urutkan
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="result-info" id="sort-result-info" style="display:none;"></div>
+      <div class="table-wrap">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>No</th><th>NIM</th><th>Nama</th><th>Jurusan</th><th>Angkatan</th><th>IPK</th></tr></thead>
+            <tbody id="sort-table-body">
+              <tr><td colspan="6"><div class="empty-state"><i class="fas fa-sort"></i><p>Pilih konfigurasi dan tekan Urutkan</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TIME COMPLEXITY PAGE ─── -->
+    <div class="page" id="page-complexity">
+      <div class="algo-panel">
+        <h4><i class="fas fa-clock"></i> Estimasi Time Complexity — Algoritma Sorting</h4>
+        <table class="complexity-table">
+          <thead><tr><th>Algoritma</th><th>Best</th><th>Average</th><th>Worst</th><th>Space</th><th>Stabil</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Bubble Sort</strong></td><td><span class="tag-on">O(n)</span></td><td><span class="tag-on2">O(n²)</span></td><td><span class="tag-on2">O(n²)</span></td><td><span class="tag-on">O(1)</span></td><td>✅ Ya</td></tr>
+            <tr><td><strong>Selection Sort</strong></td><td><span class="tag-on2">O(n²)</span></td><td><span class="tag-on2">O(n²)</span></td><td><span class="tag-on2">O(n²)</span></td><td><span class="tag-on">O(1)</span></td><td>❌ Tidak</td></tr>
+            <tr><td><strong>Insertion Sort</strong></td><td><span class="tag-on">O(n)</span></td><td><span class="tag-on2">O(n²)</span></td><td><span class="tag-on2">O(n²)</span></td><td><span class="tag-on">O(1)</span></td><td>✅ Ya</td></tr>
+            <tr><td><strong>Merge Sort</strong></td><td><span class="tag-on3">O(n log n)</span></td><td><span class="tag-on3">O(n log n)</span></td><td><span class="tag-on3">O(n log n)</span></td><td><span class="tag-on2">O(n)</span></td><td>✅ Ya</td></tr>
+            <tr><td><strong>Shell Sort</strong></td><td><span class="tag-on">O(n log n)</span></td><td><span class="tag-on3">O(n log²n)</span></td><td><span class="tag-on2">O(n²)</span></td><td><span class="tag-on">O(1)</span></td><td>❌ Tidak</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="algo-panel">
+        <h4><i class="fas fa-magnifying-glass"></i> Estimasi Time Complexity — Algoritma Searching</h4>
+        <table class="complexity-table">
+          <thead><tr><th>Algoritma</th><th>Best</th><th>Average</th><th>Worst</th><th>Prasyarat</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Linear Search</strong></td><td><span class="tag-on">O(1)</span></td><td><span class="tag-on2">O(n/2)</span></td><td><span class="tag-on2">O(n)</span></td><td>Tidak perlu urutan</td></tr>
+            <tr><td><strong>Binary Search</strong></td><td><span class="tag-on">O(1)</span></td><td><span class="tag-on3">O(log n)</span></td><td><span class="tag-on3">O(log n)</span></td><td>Data harus terurut</td></tr>
+            <tr><td><strong>Sequential Search</strong></td><td><span class="tag-on">O(1)</span></td><td><span class="tag-on2">O(n×f)</span></td><td><span class="tag-on2">O(n×f)</span></td><td>Tidak perlu urutan</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="algo-panel">
+        <h4><i class="fas fa-code"></i> Kompleksitas Operasi CRUD</h4>
+        <table class="complexity-table">
+          <thead><tr><th>Operasi</th><th>Time Complexity</th><th>Keterangan</th></tr></thead>
+          <tbody>
+            <tr><td>Tambah (Add)</td><td><span class="tag-on2">O(n)</span></td><td>Validasi duplikat NIM dengan linear search</td></tr>
+            <tr><td>Baca Semua (Read All)</td><td><span class="tag-on2">O(n)</span></td><td>Iterasi seluruh array</td></tr>
+            <tr><td>Update</td><td><span class="tag-on2">O(n)</span></td><td>Cari index + update via pointer</td></tr>
+            <tr><td>Hapus (Delete)</td><td><span class="tag-on2">O(n)</span></td><td>Cari index + hapus elemen</td></tr>
+            <tr><td>File Read (I/O)</td><td><span class="tag-on2">O(n)</span></td><td>Parsing JSON seluruh file</td></tr>
+            <tr><td>File Write (I/O)</td><td><span class="tag-on2">O(n)</span></td><td>Serialize + tulis seluruh data</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /.main-content -->
+</div><!-- /#app -->
+
+<!-- ═══ MODAL: TAMBAH/EDIT ═══ -->
+<div class="modal-backdrop" id="modal-form">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-form-title"><i class="fas fa-user-plus"></i> Tambah Mahasiswa</h3>
+      <button class="btn-close" onclick="closeModal('modal-form')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-error" id="form-error"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>NIM <span style="color:var(--rose)">*</span></label>
+          <input type="text" id="f-nim" placeholder="" maxlength="12" />
+          <p class="form-help">8–12 digit angka</p>
+        </div>
+        <div class="form-group">
+          <label>Angkatan <span style="color:var(--rose)">*</span></label>
+          <input type="number" id="f-angkatan" placeholder="2022" min="1990" max="2025" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Nama Lengkap <span style="color:var(--rose)">*</span></label>
+        <input type="text" id="f-nama" placeholder="Nama mahasiswa" />
+        <p class="form-help">Hanya huruf, spasi, titik, apostrof</p>
+      </div>
+      <div class="form-group">
+        <label>Email <span style="color:var(--rose)">*</span></label>
+        <input type="email" id="f-email" placeholder="nama@student.ac.id" />
+      </div>
+      <div class="form-group">
+        <label>Telepon <span style="color:var(--rose)">*</span></label>
+        <input type="text" id="f-telepon" placeholder="081234567890" />
+        <p class="form-help">Awali dengan +62 atau 08</p>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Jurusan <span style="color:var(--rose)">*</span></label>
+          <input type="text" id="f-jurusan" placeholder="Teknik Informatika" />
+        </div>
+        <div class="form-group">
+          <label>IPK <span style="color:var(--rose)">*</span></label>
+          <input type="number" id="f-ipk" placeholder="3.75" step="0.01" min="0" max="4" />
+          <p class="form-help">0.00 – 4.00</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-form')">Batal</button>
+      <button class="btn btn-primary" id="btn-submit-form" onclick="submitForm()">
+        <i class="fas fa-save"></i> Simpan
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: DETAIL ═══ -->
+<div class="modal-backdrop" id="modal-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <h3><i class="fas fa-id-card"></i> Detail Mahasiswa</h3>
+      <button class="btn-close" onclick="closeModal('modal-detail')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-grid" id="detail-content"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-detail')">Tutup</button>
+      <button class="btn btn-warning" id="btn-detail-edit" onclick="editFromDetail()">
+        <i class="fas fa-pen"></i> Edit
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: KONFIRMASI HAPUS ═══ -->
+<div class="modal-backdrop" id="modal-confirm">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-body" style="padding:2rem;">
+      <div class="confirm-icon">🗑️</div>
+      <p class="confirm-text">Hapus mahasiswa <strong id="confirm-nama"></strong>?<br/>Tindakan ini tidak dapat dibatalkan.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-confirm')">Batal</button>
+      <button class="btn btn-danger" id="btn-confirm-delete" onclick="confirmDelete()">
+        <i class="fas fa-trash"></i> Hapus
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ALERT CONTAINER ═══ -->
+<div class="alert-container" id="alert-container"></div>
+
+<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
+<script>
+/* ── State ── */
+let allData        = [];
+let filteredData   = [];
+let currentPage    = 1;
+let perPage        = 10;
+let editingNim     = null;
+let deletingNim    = null;
+let detailNim      = null;
+
+/* ── Init ── */
+window.addEventListener('load', async () => {
+  const res = await fetch('/api/session');
+  const s   = await res.json();
+  if (s.logged_in) showApp(s.username);
+});
+
+/* ══ AUTH ══ */
+async function doLogin() {
+  const un  = document.getElementById('login-username').value.trim();
+  const pw  = document.getElementById('login-password').value;
+  const err = document.getElementById('login-error');
+  const btn = document.getElementById('btn-login');
+  if (!un || !pw) { showLoginError('Username dan password wajib diisi.'); return; }
+  btn.innerHTML = '<span class="spinner"></span> Memverifikasi...';
+  btn.disabled = true;
+  try {
+    const res  = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username:un, password:pw}) });
+    const data = await res.json();
+    if (data.success) {
+      err.style.display = 'none';
+      showApp(data.username);
+    } else {
+      showLoginError(data.message);
+    }
+  } catch(e) { showLoginError('Koneksi gagal. Coba lagi.'); }
+  btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Masuk';
+  btn.disabled = false;
+}
+
+function showLoginError(msg) {
+  const el = document.getElementById('login-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+document.getElementById('login-password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('login-username').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('login-password').focus();
+});
+
+function togglePw() {
+  const inp = document.getElementById('login-password');
+  const eye = document.getElementById('pw-eye');
+  if (inp.type === 'password') { inp.type = 'text'; eye.className = 'fas fa-eye-slash'; }
+  else { inp.type = 'password'; eye.className = 'fas fa-eye'; }
+}
+
+function showApp(username) {
+  document.getElementById('login-page').style.display = 'none';
+  const app = document.getElementById('app');
+  app.style.display = 'flex';
+  app.classList.add('active');
+  document.getElementById('sidebar-username').textContent = username;
+  document.getElementById('user-avatar-text').textContent = username[0].toUpperCase();
+  loadDashboard();
+  loadTableData();
+}
+
+async function doLogout() {
+  await fetch('/api/logout', { method:'POST' });
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+  document.getElementById('login-username').value = '';
+  document.getElementById('login-password').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+/* ══ NAVIGATION ══ */
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+
+  const titles = {
+    dashboard: ['Dashboard', 'Ringkasan data mahasiswa'],
+    data: ['Data Mahasiswa', 'Kelola data mahasiswa'],
+    search: ['Pencarian', 'Linear, Binary & Sequential Search'],
+    sort: ['Pengurutan', 'Bubble, Selection, Insertion, Merge, Shell Sort'],
+    complexity: ['Time Complexity', 'Estimasi kompleksitas algoritma'],
+  };
+  const [t, s] = titles[page] || ['', ''];
+  document.getElementById('page-title').textContent = t;
+  document.getElementById('page-subtitle').textContent = s;
+
+  // Mark active nav
+  const navMap = { dashboard:0, data:1, search:2, sort:3, complexity:4 };
+  document.querySelectorAll('.nav-item')[navMap[page]]?.classList.add('active');
+  closeSidebar();
+}
+
+/* ══ SIDEBAR (MOBILE) ══ */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+/* ══ LOAD DASHBOARD ══ */
+async function loadDashboard() {
+  try {
+    const res  = await fetch('/api/stats');
+    const data = await res.json();
+    if (!data.success) return;
+    const s = data.data;
+    document.getElementById('stat-total').textContent   = s.total;
+    document.getElementById('stat-avg-ipk').textContent = s.avg_ipk.toFixed(2);
+    document.getElementById('stat-jurusan').textContent = Object.keys(s.jurusan_count).length;
+    document.getElementById('total-badge').textContent  = `${s.total} Mahasiswa`;
+
+    // Jurusan table
+    const tbody = document.getElementById('jurusan-table-body');
+    tbody.innerHTML = '';
+    const total = s.total || 1;
+    Object.entries(s.jurusan_count).sort((a,b)=>b[1]-a[1]).forEach(([j,c]) => {
+      const pct = ((c/total)*100).toFixed(1);
+      tbody.innerHTML += `<tr>
+        <td>${j}</td>
+        <td><strong>${c}</strong> mahasiswa</td>
+        <td><div style="display:flex;align-items:center;gap:.5rem;">
+          <div style="flex:1;height:6px;background:var(--bg3);border-radius:3px;max-width:120px;">
+            <div style="width:${pct}%;height:100%;background:var(--accent);border-radius:3px;"></div>
+          </div>
+          <span style="font-size:.78rem;color:var(--text3);">${pct}%</span>
+        </div></td>
+      </tr>`;
+    });
+    if (!tbody.innerHTML) tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:1.5rem;">Belum ada data</td></tr>';
+
+    // Recent table
+    const r = await fetch('/api/mahasiswa?per_page=5');
+    const rd = await r.json();
+    const rbody = document.getElementById('recent-table-body');
+    rbody.innerHTML = '';
+    (rd.data || []).forEach(m => {
+      rbody.innerHTML += `<tr>
+        <td><span class="nim-badge">${m.nim}</span></td>
+        <td>${m.nama}</td><td>${m.jurusan}</td>
+        <td><span class="ipk-badge ${ipkClass(m.ipk)}">${m.ipk.toFixed(2)}</span></td>
+      </tr>`;
+    });
+    if (!rd.data?.length) rbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:1.5rem;">Belum ada data</td></tr>';
+  } catch(e) { console.error(e); }
+}
+
+/* ══ LOAD TABLE DATA ══ */
+async function loadTableData() {
+  try {
+    const res  = await fetch('/api/mahasiswa?per_page=1000');
+    const data = await res.json();
+    if (!data.success) return;
+    allData      = data.data || [];
+    filteredData = [...allData];
+    populateJurusanFilter();
+    renderTable();
+  } catch(e) { console.error(e); }
+}
+
+function populateJurusanFilter() {
+  const sel = document.getElementById('filter-jurusan');
+  const jrs = [...new Set(allData.map(m => m.jurusan))].sort();
+  sel.innerHTML = '<option value="">Semua Jurusan</option>';
+  jrs.forEach(j => sel.innerHTML += `<option value="${j}">${j}</option>`);
+}
+
+function filterTable() {
+  const kw  = document.getElementById('table-search').value.toLowerCase();
+  const jrs = document.getElementById('filter-jurusan').value;
+  filteredData = allData.filter(m =>
+    (m.nama.toLowerCase().includes(kw) || m.nim.includes(kw) || m.email.toLowerCase().includes(kw)) &&
+    (!jrs || m.jurusan === jrs)
+  );
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('main-table-body');
+  const total = filteredData.length;
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+  if (currentPage > totalPages) currentPage = totalPages;
+  const start = (currentPage - 1) * perPage;
+  const slice = filteredData.slice(start, start + perPage);
+
+  tbody.innerHTML = '';
+  if (!slice.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-inbox"></i><p>Tidak ada data mahasiswa</p></div></td></tr>`;
+  } else {
+    slice.forEach((m, i) => {
+      tbody.innerHTML += `<tr>
+        <td style="color:var(--text3);font-size:.8rem;">${start + i + 1}</td>
+        <td><span class="nim-badge">${m.nim}</span></td>
+        <td><strong>${m.nama}</strong><br/><span style="font-size:.75rem;color:var(--text3);">${m.email}</span></td>
+        <td>${m.jurusan}</td>
+        <td>${m.angkatan}</td>
+        <td><span class="ipk-badge ${ipkClass(m.ipk)}">${m.ipk.toFixed(2)}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="btn btn-sm" style="background:rgba(6,182,212,.1);color:#67e8f9;border:1px solid rgba(6,182,212,.25);" onclick="openDetailModal('${m.nim}')" title="Detail"><i class="fas fa-eye"></i></button>
+            <button class="btn btn-warning btn-sm" onclick="openEditModal('${m.nim}')" title="Edit"><i class="fas fa-pen"></i></button>
+            <button class="btn btn-danger btn-sm" onclick="openDeleteModal('${m.nim}','${m.nama}')" title="Hapus"><i class="fas fa-trash"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    });
+  }
+
+  // Pagination
+  document.getElementById('page-info').textContent = total > 0
+    ? `Menampilkan ${start+1}–${Math.min(start+perPage, total)} dari ${total} data`
+    : 'Tidak ada data';
+  const btns = document.getElementById('page-btns');
+  btns.innerHTML = '';
+  if (totalPages > 1) {
+    btns.innerHTML += `<button class="page-btn" ${currentPage===1?'disabled':''} onclick="changePage(${currentPage-1})"><i class="fas fa-chevron-left"></i></button>`;
+    for (let p = Math.max(1,currentPage-1); p <= Math.min(totalPages,currentPage+1); p++) {
+      btns.innerHTML += `<button class="page-btn ${p===currentPage?'active':''}" onclick="changePage(${p})">${p}</button>`;
+    }
+    btns.innerHTML += `<button class="page-btn" ${currentPage===totalPages?'disabled':''} onclick="changePage(${currentPage+1})"><i class="fas fa-chevron-right"></i></button>`;
+  }
+}
+
+function changePage(p) { currentPage = p; renderTable(); }
+
+function ipkClass(ipk) {
+  if (ipk >= 3.5) return 'ipk-high';
+  if (ipk >= 2.75) return 'ipk-medium';
+  return 'ipk-low';
+}
+
+/* ══ MODAL: TAMBAH ══ */
+function openAddModal() {
+  editingNim = null;
+  document.getElementById('modal-form-title').innerHTML = '<i class="fas fa-user-plus"></i> Tambah Mahasiswa';
+  document.getElementById('btn-submit-form').innerHTML  = '<i class="fas fa-save"></i> Simpan';
+  clearForm();
+  document.getElementById('f-nim').disabled = false;
+  openModal('modal-form');
+}
+
+/* ══ MODAL: EDIT ══ */
+function openEditModal(nim) {
+  const m = allData.find(x => x.nim === nim);
+  if (!m) return;
+  editingNim = nim;
+  document.getElementById('modal-form-title').innerHTML = '<i class="fas fa-pen"></i> Edit Mahasiswa';
+  document.getElementById('btn-submit-form').innerHTML  = '<i class="fas fa-save"></i> Perbarui';
+  document.getElementById('f-nim').value      = m.nim;
+  document.getElementById('f-nama').value     = m.nama;
+  document.getElementById('f-email').value    = m.email;
+  document.getElementById('f-telepon').value  = m.telepon;
+  document.getElementById('f-jurusan').value  = m.jurusan;
+  document.getElementById('f-angkatan').value = m.angkatan;
+  document.getElementById('f-ipk').value      = m.ipk;
+  document.getElementById('form-error').style.display = 'none';
+  openModal('modal-form');
+}
+
+function editFromDetail() {
+  closeModal('modal-detail');
+  if (detailNim) openEditModal(detailNim);
+}
+
+/* ══ MODAL: DETAIL ══ */
+function openDetailModal(nim) {
+  const m = allData.find(x => x.nim === nim);
+  if (!m) return;
+  detailNim = nim;
+  document.getElementById('detail-content').innerHTML = `
+    <div class="detail-item"><label>NIM</label><div class="detail-val"><span class="nim-badge">${m.nim}</span></div></div>
+    <div class="detail-item"><label>Angkatan</label><div class="detail-val">${m.angkatan}</div></div>
+    <div class="detail-separator"></div>
+    <div class="detail-item" style="grid-column:1/-1;"><label>Nama Lengkap</label><div class="detail-val" style="font-size:1.1rem;">${m.nama}</div></div>
+    <div class="detail-separator"></div>
+    <div class="detail-item"><label>Email</label><div class="detail-val">${m.email}</div></div>
+    <div class="detail-item"><label>Telepon</label><div class="detail-val">${m.telepon}</div></div>
+    <div class="detail-item"><label>Jurusan</label><div class="detail-val">${m.jurusan}</div></div>
+    <div class="detail-item"><label>IPK</label><div class="detail-val"><span class="ipk-badge ${ipkClass(m.ipk)}">${m.ipk.toFixed(2)}</span></div></div>
+  `;
+  openModal('modal-detail');
+}
+
+/* ══ MODAL: HAPUS ══ */
+function openDeleteModal(nim, nama) {
+  deletingNim = nim;
+  document.getElementById('confirm-nama').textContent = nama;
+  openModal('modal-confirm');
+}
+
+async function confirmDelete() {
+  if (!deletingNim) return;
+  const btn = document.getElementById('btn-confirm-delete');
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled  = true;
+  try {
+    const res  = await fetch(`/api/mahasiswa/${deletingNim}`, { method:'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      showAlert('success', 'Berhasil', data.message);
+      closeModal('modal-confirm');
+      await loadTableData();
+      await loadDashboard();
+    } else {
+      showAlert('error', 'Gagal', data.message);
+    }
+  } catch(e) { showAlert('error', 'Error', 'Koneksi gagal.'); }
+  btn.innerHTML = '<i class="fas fa-trash"></i> Hapus';
+  btn.disabled  = false;
+}
+
+/* ══ FORM SUBMIT ══ */
+async function submitForm() {
+  const btn = document.getElementById('btn-submit-form');
+  const err = document.getElementById('form-error');
+  const payload = {
+    nim:      document.getElementById('f-nim').value.trim(),
+    nama:     document.getElementById('f-nama').value.trim(),
+    email:    document.getElementById('f-email').value.trim(),
+    telepon:  document.getElementById('f-telepon').value.trim(),
+    jurusan:  document.getElementById('f-jurusan').value.trim(),
+    angkatan: document.getElementById('f-angkatan').value.trim(),
+    ipk:      document.getElementById('f-ipk').value.trim(),
+  };
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled  = true;
+  err.style.display = 'none';
+  try {
+    let res;
+    if (editingNim) {
+      res = await fetch(`/api/mahasiswa/${editingNim}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    } else {
+      res = await fetch('/api/mahasiswa', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    }
+    const data = await res.json();
+    if (data.success) {
+      showAlert('success', 'Berhasil', data.message);
+      closeModal('modal-form');
+      await loadTableData();
+      await loadDashboard();
+    } else {
+      err.textContent = data.message;
+      err.style.display = 'block';
+    }
+  } catch(e) { err.textContent = 'Koneksi gagal.'; err.style.display = 'block'; }
+  btn.innerHTML = editingNim ? '<i class="fas fa-save"></i> Perbarui' : '<i class="fas fa-save"></i> Simpan';
+  btn.disabled  = false;
+}
+
+/* ══ SEARCH ══ */
+async function doSearch() {
+  const kw     = document.getElementById('search-keyword').value.trim();
+  const method = document.getElementById('search-method').value;
+  const field  = document.getElementById('search-field').value;
+  if (!kw) { showAlert('info', 'Info', 'Masukkan kata kunci pencarian.'); return; }
+  const res   = await fetch(`/api/search?q=${encodeURIComponent(kw)}&method=${method}&field=${field}`);
+  const data  = await res.json();
+  const tbody = document.getElementById('search-table-body');
+  const info  = document.getElementById('search-result-info');
+  if (!data.success) { showAlert('error', 'Error', data.message); return; }
+  info.style.display = 'flex';
+  info.innerHTML = `
+    <span>Algoritma: <strong>${data.algorithm}</strong></span>
+    <span>Ditemukan: <strong>${data.total} hasil</strong></span>
+    <span>Perbandingan: <strong>${data.comparisons}×</strong></span>
+    <span>Waktu: <strong>${data.elapsed_ms} ms</strong></span>
+  `;
+  tbody.innerHTML = '';
+  if (!data.data.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-search"></i><p>Tidak ditemukan hasil untuk "<strong>${kw}</strong>"</p></div></td></tr>`;
+  } else {
+    data.data.forEach(m => {
+      tbody.innerHTML += `<tr>
+        <td><span class="nim-badge">${m.nim}</span></td>
+        <td>${m.nama}</td><td>${m.jurusan}</td><td>${m.angkatan}</td>
+        <td><span class="ipk-badge ${ipkClass(m.ipk)}">${m.ipk.toFixed(2)}</span></td>
+        <td><div class="action-btns">
+          <button class="btn btn-sm" style="background:rgba(6,182,212,.1);color:#67e8f9;border:1px solid rgba(6,182,212,.25);" onclick="openDetailModal('${m.nim}')"><i class="fas fa-eye"></i></button>
+          <button class="btn btn-warning btn-sm" onclick="openEditModal('${m.nim}');showPage('data');"><i class="fas fa-pen"></i></button>
+        </div></td>
+      </tr>`;
+    });
+  }
+}
+
+/* ══ SORT ══ */
+async function doSort() {
+  const method    = document.getElementById('sort-method').value;
+  const key       = document.getElementById('sort-key').value;
+  const order     = document.getElementById('sort-order').value;
+  const res       = await fetch(`/api/sort?method=${method}&key=${key}&order=${order}`);
+  const data      = await res.json();
+  const tbody     = document.getElementById('sort-table-body');
+  const info      = document.getElementById('sort-result-info');
+  if (!data.success) { showAlert('error', 'Error', data.message); return; }
+  info.style.display = 'flex';
+  info.innerHTML = `
+    <span>Algoritma: <strong>${data.algorithm}</strong></span>
+    <span>Total: <strong>${data.total} data</strong></span>
+    <span>Operasi: <strong>${data.operations}×</strong></span>
+    <span>Waktu: <strong>${data.elapsed_ms} ms</strong></span>
+  `;
+  tbody.innerHTML = '';
+  data.data.forEach((m, i) => {
+    tbody.innerHTML += `<tr>
+      <td style="color:var(--text3);font-size:.8rem;">${i+1}</td>
+      <td><span class="nim-badge">${m.nim}</span></td>
+      <td>${m.nama}</td><td>${m.jurusan}</td><td>${m.angkatan}</td>
+      <td><span class="ipk-badge ${ipkClass(m.ipk)}">${m.ipk.toFixed(2)}</span></td>
+    </tr>`;
+  });
+}
+
+/* ══ MODAL HELPERS ══ */
+function openModal(id)  { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function clearForm() {
+  ['f-nim','f-nama','f-email','f-telepon','f-jurusan','f-angkatan','f-ipk'].forEach(id => {
+    document.getElementById(id).value = '';
+    document.getElementById(id).classList.remove('error');
+  });
+  document.getElementById('form-error').style.display = 'none';
+}
+
+/* ══ ALERT ══ */
+function showAlert(type, title, msg, duration=4000) {
+  const icons = { success:'fas fa-check-circle', error:'fas fa-times-circle', info:'fas fa-info-circle' };
+  const el = document.createElement('div');
+  el.className = `alert alert-${type}`;
+  el.innerHTML = `<i class="${icons[type]||icons.info}"></i>
+    <div class="alert-body"><div class="alert-title">${title}</div><div class="alert-msg">${msg}</div></div>`;
+  document.getElementById('alert-container').prepend(el);
+  setTimeout(() => { el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, duration);
+}
+
+/* ── Close modal on backdrop click ── */
+document.querySelectorAll('.modal-backdrop').forEach(bd => {
+  bd.addEventListener('click', e => { if (e.target === bd) bd.classList.remove('show'); });
+});
+</script>
+</body>
+</html>
